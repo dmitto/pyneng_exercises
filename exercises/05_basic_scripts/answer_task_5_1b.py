@@ -52,7 +52,7 @@ london_co = {
 }
 
 device = input("Введите имя устройства: ")
-device_keys = list(london_co[device].keys())
-device_keys_str = ",".join(device_keys)
-param = input("Введите имя параметра ("+device_keys_str+"): ")
-print(london_co[device][param])
+params = ", ".join(london_co[device].keys())
+parameter = input(f"Введите имя параметра ({params}): ")
+
+print(london_co[device][parameter])
