@@ -46,5 +46,6 @@ london_co = {
 }
 
 device = input("Введите имя устройства: ")
-param = input("Введите имя параметра: ")
-print(london_co[device][param])
+parameter = input("Введите имя параметра: ")
+
+print(london_co[device][parameter])
