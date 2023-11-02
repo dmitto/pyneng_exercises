@@ -30,3 +30,20 @@ Out[1]: '11111111111111111111111111110000'
 
 Ограничение: Все задания надо выполнять используя только пройденные темы.
 """
+
+ip_net = input("Введите IP-адрес сети в формате <адрес сети>/<маска>: ")
+ip_net_list = ip_net.split("/")
+ip_net_tmpl = """Network:
+{0:<10} {1:<10} {2:<10} {3:<10}
+{0:08b}  {1:08b}  {2:08b}  {3:08b}
+"""
+ip_net_addr = ip_net_list[0].split(".")
+print(ip_net_tmpl.format(int(ip_net_addr[0]), int(ip_net_addr[1]), int(ip_net_addr[2]), int(ip_net_addr[3])))
+print("Mask:")
+print(ip_net[-3:])
+ip_net_mask_str = "1" * int(ip_net_list[1]) + "0" * (32 - int(ip_net_list[1]))
+#print(ip_net_mask_str)
+ip_net_mask_tmpl = """{0:<10} {1:<10} {2:<10} {3:<10}
+{0:08b}  {1:08b}  {2:08b}  {3:08b}
+"""
+print(ip_net_mask_tmpl.format(int(ip_net_mask_str[:8], 2), int(ip_net_mask_str[8:16], 2), int(ip_net_mask_str[16:24], 2), int(ip_net_mask_str[24:], 2)))
