@@ -40,3 +40,16 @@
 Ограничение: Все задания надо выполнять используя только пройденные темы.
 
 """
+
+result = []
+with open("CAM_table.txt") as f:
+    for line in f:
+        line_list = line.split()
+        if line_list and line_list[0].isdigit():
+            line_list[0] = int(line_list[0])
+            line_list.remove(line_list[2])
+            result.append(line_list)
+result.sort()
+for line in result:
+    vlan, mac, intf = line
+    print(f"{vlan:<9}{mac:<20}{intf}")
