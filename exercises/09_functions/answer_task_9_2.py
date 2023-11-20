@@ -61,25 +61,15 @@ trunk_config_2 = {
     "FastEthernet0/14": [117],
 }
 
-def generate_trunk_config(intf_vlan_mapping, trunk_template):
-    """
-    - intf_vlan_mapping: ожидает как аргумент словарь с соответствием интерфейс-VLANы
-    такого вида:
-        {'FastEthernet0/1': [10, 20],
-        'FastEthernet0/2': [11, 30],
-        'FastEthernet0/4': [17]}
-    - trunk_template: ожидает как аргумент шаблон конфигурации trunk-портов в виде
-    списка команд (список trunk_mode_template)
-    """
-    command_list = []
-    for intf, vlans in intf_vlan_mapping.items():
-        command_list.append(f"interface {intf}")
-        for line in trunk_template:
-            if line.endswith("allowed vlan"):
-                vlans_str = ",".join([str(vl) for vl in vlans])
-                command_list.append(f"{line} {vlans_str}")
-            else:
-                command_list.append(line)
-    return command_list
 
-print(generate_trunk_config(trunk_config_2, trunk_mode_template))
+def generate_trunk_config(intf_vlan_mapping, trunk_template):
+    trunk_conf = []
+    for port, vlans in intf_vlan_mapping.items():
+        trunk_conf.append(f"interface {port}")
+        for command in trunk_template:
+            if command.endswith("allowed vlan"):
+                vlans_str = ",".join([str(vl) for vl in vlans])
+                trunk_conf.append(f"{command} {vlans_str}")
+            else:
+                trunk_conf.append(command)
+    return trunk_conf
