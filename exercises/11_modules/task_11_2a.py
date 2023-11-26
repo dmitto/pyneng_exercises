@@ -78,24 +78,11 @@ from task_11_2 import create_network_map
 from draw_network_graph import draw_topology
 
 def unique_network_map(topology_dict):
-    #print("dict keys =", list(topology_dict.keys()))
-    #print("="*50)
-    #print("dict values =", list(topology_dict.values()))
-    #print("="*50)
-    #print("dict items =", list(topology_dict.items()))
-    #print("="*50)
-    #pprint(topology_dict)
-    #print("="*50)
-    new_dict = {}
-    key_list = []
-    for key, value in list(topology_dict.items()):
-        for key_2, value_2 in list(topology_dict.items()):
-            if (key_2 == value) and (key != key_2) and (not value_2 in key_list):
-                #print("key =",key,"value =",value)
-                #print("key_2 =",key_2,"value_2 =",value_2)
-                key_list.append(key_2)
-                del topology_dict[key_2]
-    return topology_dict
+    network_map = {}
+    for key, value in topology_dict.items():
+        if not network_map.get(value) == key:
+            network_map[key] = value
+    return network_map
 
 infiles = [
     "sh_cdp_n_sw1.txt",
