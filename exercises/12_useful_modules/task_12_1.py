@@ -17,3 +17,20 @@ IP-адрес считается доступным, если выполнени
 
 Ограничение: Все задания надо выполнять используя только пройденные темы.
 """
+import subprocess
+
+def ping_ip_addresses(ip_list):
+    ip_avalible = []
+    ip_not_avalible = []
+    for ip in ip_list:
+        result = subprocess.run(["ping", "-c", "1", ip], stdout=subprocess.DEVNULL)
+        if result.returncode == 0:
+            #print(ip, "доступен")
+            ip_avalible.append(ip)
+        else:
+            #print(ip, "не доступен")
+            ip_not_avalible.append(ip)
+    return ip_avalible, ip_not_avalible
+
+#ips = ["1.1.1.1", "8.8.8.8", "192.168.1.1", "10.2.5.4"]
+#print(ping_ip_addresses(ips))
