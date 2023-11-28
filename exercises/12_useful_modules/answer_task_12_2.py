@@ -37,24 +37,17 @@
 import ipaddress
 
 
-def convert_ranges_to_ip_list(ip_list):
-    result = []
-    for ip in ip_list:
-        if "-" in ip:
-            ip_range = ip.split("-")
-            if ip_range[1].isdigit():
-                dif = int(ip_range[1]) - int(ip_range[0].split(".")[-1])
-            else:
-                dif =  int(ipaddress.ip_address(ip_range[1])) - int(ipaddress.ip_address(ip_range[0]))
-            ip_n = ipaddress.ip_address(ip_range[0])
-            result.append(str(ip_n))
-            for n in range(dif):
-                ip_n += 1
-                result.append(str(ip_n))
+def convert_ranges_to_ip_list(ip_addresses):
+    ip_list = []
+    for ip_address in ip_addresses:
+        if "-" in ip_address:
+            start_ip, stop_ip = ip_address.split("-")
+            if "." not in stop_ip:
+                stop_ip = ".".join(start_ip.split(".")[:-1] + [stop_ip])
+            start_ip = ipaddress.ip_address(start_ip)
+            stop_ip = ipaddress.ip_address(stop_ip)
+            for ip in range(int(start_ip), int(stop_ip) + 1):
+                ip_list.append(str(ipaddress.ip_address(ip)))
         else:
-            result.append(ip)
-    return result
-
-ips = ['8.8.4.4', '1.1.1.1-3', '172.21.41.128-172.21.41.132']
-if __name__ == "__main__":
-    print(convert_ranges_to_ip_list(ips))
+            ip_list.append(ip_address)
+    return ip_list
