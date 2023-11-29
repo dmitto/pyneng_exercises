@@ -18,17 +18,15 @@ Reachable    Unreachable
              10.1.1.9
 
 """
-
 from tabulate import tabulate
-#from task_12_1 import ping_ip_addresses
 
 
-def print_ip_table(ip_reach,ip_unreach):
-    result = {"Reachable": ip_reach, "Unreachable": ip_unreach}
-    print(tabulate(result, headers='keys'))
+def print_ip_table(reach_ip, unreach_ip):
+    table = {"Reachable": reach_ip, "Unreachable": unreach_ip}
+    print(tabulate(table, headers="keys"))
 
-#ip_l = ['1.1.1.1', '10.4.3.2', '100.100.100.36', '192.168.1.1']
-#ip_l_tested = ping_ip_addresses(ip_l)
-#print(ip_l_tested)
 
-#print_ip_table(*ip_l_tested)
+if __name__ == "__main__":
+    reach_ip = ["10.1.1.1", "10.1.1.2"]
+    unreach_ip = ["10.1.1.7", "10.1.1.8", "10.1.1.9"]
+    print_ip_table(reach_ip, unreach_ip)
