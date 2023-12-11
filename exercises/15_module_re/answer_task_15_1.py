@@ -25,11 +25,9 @@
 """
 import re
 
-from pprint import pprint
-def get_ip_from_cfg(conf_file):
-    file_str = open(conf_file).read()
-    list_ip = re.findall(r" ip address (\S+)\s(\S+)", file_str)
-    return list_ip
 
-if __name__ == '__main__':
-    print(get_ip_from_cfg("config_r1.txt"))
+def get_ip_from_cfg(config):
+    regex = r"ip address (\S+) (\S+)"
+    with open(config) as f:
+        result = [m.groups() for m in re.finditer(regex, f.read())]
+    return result
