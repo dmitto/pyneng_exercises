@@ -27,15 +27,21 @@ description Connected to SW1 port Eth 0/1
 Проверить работу функции на файле sh_cdp_n_sw1.txt.
 """
 import re
-from pprint import pprint
 
-def generate_description_from_cdp(cdp_file):
-    with open(cdp_file) as f:
-        regex = re.compile("(?P<device>\S+)\s+(?P<intf_local>\S+ \S+)\s+\d+.*?\d+\s+(?P<intf_connect>[\S+ ]+)")
-        template = "description Connected to {} port {}"
-        match = regex.finditer(f.read())
-        result = {m.group('intf_local'): template.format(*m.group('device', 'intf_connect')) for m in match}
-        return result
+
+def generate_description_from_cdp(sh_cdp_filename):
+    regex = re.compile(
+        r"(?P<r_dev>\w+)  +(?P<l_intf>\S+ \S+)"
+        r"  +\d+  +[\w ]+  +\S+ +(?P<r_intf>\S+ \S+)"
+    )
+    description = "description Connected to {} port {}"
+    intf_desc_map = {}
+    with open(sh_cdp_filename) as f:
+        for match in regex.finditer(f.read()):
+            r_dev, l_intf, r_intf = match.group("r_dev", "l_intf", "r_intf")
+            intf_desc_map[l_intf] = description.format(r_dev, r_intf)
+    return intf_desc_map
+
 
 if __name__ == "__main__":
-    pprint(generate_description_from_cdp("sh_cdp_n_sw1.txt"))
+    print(generate_description_from_cdp("sh_cdp_n_sw1.txt"))
