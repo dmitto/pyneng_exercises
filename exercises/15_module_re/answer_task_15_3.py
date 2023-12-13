@@ -32,24 +32,23 @@ object network LOCAL_10.1.9.5
 
 Во всех правилах для ASA интерфейсы будут одинаковыми (inside,outside).
 """
-
 import re
-from pprint import pprint
 
-def convert_ios_nat_to_asa(file_in, file_out):
-    regex = re.compile(r"(?P<local_ip>[\d\.]+) (?P<local_port>\d+) interface (?P<global_intf>\S+) (?P<global_port>\d+)")
-    with open(file_in) as f:
-        match = regex.finditer(f.read())
-    template = "object network LOCAL_{}\n host {}\n nat (inside,outside) static interface service tcp {} {}\n"
-    result_list = []
-    for m in match:
-        #print(m.groupdict())
-        result_list.append(template.format(m.group("local_ip"), m.group("local_ip"), m.group("local_port"), m.group("global_port")))
-    #print("="*50)
-    #for command in result_list:
-    #    print(command)
-    with open(file_out,"w") as out:
-        out.writelines(result_list)
+
+def convert_ios_nat_to_asa(cisco_ios, cisco_asa):
+    regex = (
+        "tcp (?P<local_ip>\S+) +(?P<lport>\d+) +interface +\S+ (?P<outside_port>\d+)"
+    )
+    asa_template = (
+        "object network LOCAL_{local_ip}\n"
+        " host {local_ip}\n"
+        " nat (inside,outside) static interface service tcp {lport} {outside_port}\n"
+    )
+    with open(cisco_ios) as f, open(cisco_asa, "w") as asa_nat_cfg:
+        data = re.finditer(regex, f.read())
+        for match in data:
+            asa_nat_cfg.write(asa_template.format(**match.groupdict()))
+
 
 if __name__ == "__main__":
-    convert_ios_nat_to_asa("cisco_nat_config.txt", "out.txt")
+    convert_ios_nat_to_asa("cisco_nat_config.txt", "cisco_asa_config.txt")
