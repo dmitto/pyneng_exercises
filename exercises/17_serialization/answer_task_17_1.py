@@ -33,36 +33,24 @@ sw2_dhcp_snooping.txt, sw3_dhcp_snooping.txt.
 """
 import csv
 import re
-from pprint import pprint
+import glob
 
-regexp = r"^(?P<mac>\S+) +(?P<ip>\S+) +\d+ +\S+ +(?P<vlan>\d+) +(?P<interface>\S+)"
-regexp_ip = r"(?:\d+\.){3}\d+"
 
 def write_dhcp_snooping_to_csv(filenames, output):
-    headers = ['switch', 'mac', 'ip', 'vlan', 'interface']
-    data = []
-    print(filenames)
-    for name in filenames:
-        sw_name = name.split('_')[0]
-        with open(name) as f_in:
-            table = f_in.read()
-            match = re.finditer(regexp, table, re.M)
-            for line in match:
-                result_dict = {}
-                result_dict['switch'] = sw_name
-                result_dict.update(line.groupdict())
-                data.append(result_dict)
-    with open(output, 'w') as f_out:
-        writer = csv.DictWriter(f_out, fieldnames=headers)
-        writer.writeheader()
-        writer.writerows(data)
+    regex = r"(\S+) +(\S+) +\d+ +\S+ +(\d+) +(\S+)"
+    with open(output, "w") as dest:
+        writer = csv.writer(dest)
+        writer.writerow(["switch", "mac", "ip", "vlan", "interface"])
+        for filename in filenames:
+            switch = re.search("([^/]+)_dhcp_snooping.txt", filename).group(1)
+            with open(filename) as f:
+                for line in f:
+                    match = re.search(regex, line)
+                    if match:
+                        writer.writerow((switch,) + match.groups())
 
 
-file_list = [
-    'sw1_dhcp_snooping.txt',
-    'sw2_dhcp_snooping.txt',
-    'sw3_dhcp_snooping.txt'
-    ]
-
-if __name__ == '__main__':
-    write_dhcp_snooping_to_csv(file_list, 'out_17_1.csv')
+if __name__ == "__main__":
+    sh_dhcp_snoop_files = glob.glob("*_dhcp_snooping.txt")
+    print(sh_dhcp_snoop_files)
+    write_dhcp_snooping_to_csv(sh_dhcp_snoop_files, "example_csv.csv")
