@@ -42,42 +42,36 @@
 
 Кроме того, создан список заголовков (headers), который должен быть записан в CSV.
 """
-
-import glob
 import re
 import csv
+import glob
 
-def parse_sh_version(content):
-    regexp = r"Cisco IOS .*? Version (?P<ios>\S+), .*router uptime is (?P<uptime>[\w, ]+)\n.+System image file is \"(?P<image>\S+)\""
-    match = re.search(regexp, content, re.DOTALL)
+
+def parse_sh_version(sh_ver_output):
+    regex = (
+        "Cisco IOS .*? Version (?P<ios>\S+), .*"
+        "uptime is (?P<uptime>[\w, ]+)\n.*"
+        'image file is "(?P<image>\S+)".*'
+    )
+    match = re.search(regex, sh_ver_output, re.DOTALL,)
     if match:
         return match.group("ios", "image", "uptime")
 
 
 def write_inventory_to_csv(data_filenames, csv_filename):
     headers = ["hostname", "ios", "image", "uptime"]
-    result = []
-    for name in data_filenames:
-        list_temp = []
-        with open(name) as f:
-            res = parse_sh_version(f.read())
-            hostname = re.search("sh_version_(\S+).txt", name).group(1)
-            list_temp.append(hostname)
-            #print('Hostname = ',hostname)
-            list_temp.extend(list(res))
-            #print(list_temp)
-            result.append(list_temp)
-    #print(result)
-    with open(csv_filename, 'w') as f:
+    with open(csv_filename, "w") as f:
         writer = csv.writer(f)
         writer.writerow(headers)
-        for line in result:
-            writer.writerow(line)
+
+        for filename in data_filenames:
+            hostname = re.search("sh_version_(\S+).txt", filename).group(1)
+            with open(filename) as f:
+                parsed_data = parse_sh_version(f.read())
+                if parsed_data:
+                    writer.writerow([hostname] + list(parsed_data))
 
 
-sh_version_files = glob.glob("sh_vers*")
-#print(sh_version_files)
-
-
-if __name__ == '__main__':
-    write_inventory_to_csv(sh_version_files, 'out_17_2.csv')
+if __name__ == "__main__":
+    sh_version_files = glob.glob("sh_vers*")
+    write_inventory_to_csv(sh_version_files, "routers_inventory.csv")
