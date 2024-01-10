@@ -29,7 +29,7 @@ from pprint import pprint
 
 def parse_sh_cdp_neighbors(content):
     result = {}
-    regexp = r"(?P<neighbor_name>\w+) +(?P<intf_local>\S+ \S+) +\d+.*?\d+ +(?P<intf_neighbor>\S+ \S+)"
+    regexp = r"(?P<device>\w+) +(?P<intf_local>\S+ \S+) +\d+.*?\d+.+ (?P<intf_connect>\S+ \S+)"
     device_name = re.search("(\w+)\>", content).group(1)
     result[device_name] = {}
     match_iter = re.finditer(regexp, content)
