@@ -47,6 +47,7 @@ import glob
 import re
 import csv
 
+
 def parse_sh_version(content):
     regexp = r"Cisco IOS .*? Version (?P<ios>\S+), .*router uptime is (?P<uptime>[\w, ]+)\n.+System image file is \"(?P<image>\S+)\""
     match = re.search(regexp, content, re.DOTALL)
@@ -56,27 +57,19 @@ def parse_sh_version(content):
 
 def write_inventory_to_csv(data_filenames, csv_filename):
     headers = ["hostname", "ios", "image", "uptime"]
-    result = []
-    for name in data_filenames:
-        list_temp = []
-        with open(name) as f:
-            res = parse_sh_version(f.read())
-            hostname = re.search("sh_version_(\S+).txt", name).group(1)
-            list_temp.append(hostname)
-            #print('Hostname = ',hostname)
-            list_temp.extend(list(res))
-            #print(list_temp)
-            result.append(list_temp)
-    #print(result)
-    with open(csv_filename, 'w') as f:
-        writer = csv.writer(f)
+    with open(csv_filename, 'w') as f_out:
+        writer = csv.writer(f_out)
         writer.writerow(headers)
-        for line in result:
-            writer.writerow(line)
+        for name in data_filenames:
+            list_temp = []
+            with open(name) as f_in:
+                res = parse_sh_version(f_in.read())
+                hostname = re.search("sh_version_(\S+).txt", name).group(1)
+                writer.writerow([hostname] + list(res))
 
 
 sh_version_files = glob.glob("sh_vers*")
-#print(sh_version_files)
+# print(sh_version_files)
 
 
 if __name__ == '__main__':
