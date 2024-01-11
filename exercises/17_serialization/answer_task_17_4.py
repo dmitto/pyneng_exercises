@@ -40,10 +40,8 @@ C-3PO,c3po@gmail.com,16/12/2019 17:24
 Функции convert_str_to_datetime и convert_datetime_to_str использовать не обязательно.
 
 """
-
-import datetime
 import csv
-from pprint import pprint
+import datetime
 
 
 def convert_str_to_datetime(datetime_str):
@@ -61,31 +59,21 @@ def convert_datetime_to_str(datetime_obj):
 
 
 def write_last_log_to_csv(source_log, output):
-    with open(source_log) as f_in:
-        log_dict = {}
-        reader = csv.DictReader(f_in)
-        for row in reader:
-            name = row['Name']
-            email = row['Email']
-            last_ch = row['Last Changed']
-            if not(email in log_dict.keys()):
-                log_dict[email] = {last_ch: name}
-            else:
-                log_dict[email].update({last_ch: name})
-    data = []
-    with open(output, 'w') as f_out:
-        writer = csv.writer(f_out)
-        writer.writerow(['Name', 'Email', 'Last Changed'])
-        for key,value in log_dict.items():
-            max_last_ch = list(value.keys())[0]
-            last_ch_name = list(value.values())[0]
-            for key_1, value_1 in value.items():
-                if convert_str_to_datetime(key_1) > convert_str_to_datetime(max_last_ch):
-                    max_last_ch = key_1
-                    last_ch_name = value_1
-            data.append([last_ch_name, key, max_last_ch])
-            writer.writerow([last_ch_name, key, max_last_ch])
+    with open(source_log) as f:
+        data = list(csv.reader(f))
+        header = data[0]
+    result = {}
+    sorted_by_date = sorted(
+        data[1:], key=lambda x: convert_str_to_datetime(x[2])
+    )
+    for name, email, date in sorted_by_date:
+        result[email] = (name, email, date)
+    with open(output, "w") as dest:
+        writer = csv.writer(dest)
+        writer.writerow(header)
+        for row in result.values():
+            writer.writerow(row)
 
 
 if __name__ == "__main__":
-    write_last_log_to_csv("mail_log.csv", "out_17_4.csv")
+    write_last_log_to_csv("mail_log.csv", "example_result.csv")
