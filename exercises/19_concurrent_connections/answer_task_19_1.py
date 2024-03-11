@@ -23,34 +23,28 @@
 а затем запустить эту функцию в разных потоках для разных
 IP-адресов с помощью concurrent.futures (это надо сделать в функции ping_ip_addresses).
 """
-
-from pprint import pprint
-from concurrent.futures import ThreadPoolExecutor
-from netmiko import ConnectHandler
-import yaml
 import subprocess
+from concurrent.futures import ThreadPoolExecutor
 
-def ping_ip_address(ip_addr):
-    result = subprocess.run(['ping', '-c', '1', ip_addr], stdout=subprocess.DEVNULL)
-    return result.returncode
+
+def ping_ip(ip):
+    result = subprocess.run(["ping", "-c", "3", "-n", ip], stdout=subprocess.DEVNULL)
+    ip_is_reachable = result.returncode == 0
+    return ip_is_reachable
+
 
 def ping_ip_addresses(ip_list, limit=3):
-    ip_list_avalible = []
-    ip_list_not_avalible = []
+    reachable = []
+    unreachable = []
     with ThreadPoolExecutor(max_workers=limit) as executor:
-        result = map(ping_ip_address, ip_list)
-        for ip, out in zip(ip_list, result):
-            if out == 0:
-                ip_list_avalible.append(ip)
-            else:
-                ip_list_not_avalible.append(ip)
-    return ip_list_avalible, ip_list_not_avalible
+        results = executor.map(ping_ip, ip_list)
+    for ip, status in zip(ip_list, results):
+        if status:
+            reachable.append(ip)
+        else:
+            unreachable.append(ip)
+    return reachable, unreachable
 
-if __name__ == '__main__':
-    with open('devices.yaml') as f:
-        devices = yaml.safe_load(f)
-    ip_ls = []
-    for device in devices:
-        ip_ls.append(device['host'])
-        ip_ls.append(device['host']+'1')
-    print(ping_ip_addresses(ip_ls))
+
+if __name__ == "__main__":
+    print(ping_ip_addresses(["8.8.8.8", "192.168.100.22", "192.168.100.1"]))
